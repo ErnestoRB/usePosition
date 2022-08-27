@@ -2,6 +2,13 @@
   "name": "@ernestorb/useposition",
   "version": "1.0.0",
   "type": "module",
+  "repository": "github:ErnestoRB/usePosition",
+  "keywords": [
+    "react hook",
+    "usePosition",
+    "boundingClientRect",
+    "element position"
+  ],
   "main": "./dist/index.umd.cjs",
   "types": "./dist/index.d.ts",
   "module": "./dist/index.js",

@@ -7,11 +7,12 @@ interface PositionConfig {
 interface PositionExtraValues {
   windowResize: boolean;
 }
+type PositionCallback = (rect: DOMRect, extra: PositionExtraValues) => any;
 
 interface PositionReg {
   id?: string;
   ref?: HTMLElement;
-  cb?: (rect: DOMRect, extra: PositionExtraValues) => any;
+  cb?: PositionCallback;
   prevVal?: DOMRect;
   depsChange?: boolean;
   config: PositionConfig;
@@ -32,7 +33,6 @@ let lastExecute = 0;
 const watch = (time: DOMHighResTimeStamp) => {
   if (time - lastExecute < 100) {
     window.requestAnimationFrame(watch);
-
     return;
   }
   lastExecute = time;
@@ -68,7 +68,6 @@ const watch = (time: DOMHighResTimeStamp) => {
     oldWidth = actualWidth;
     oldHeight = actualHeight;
   }
-
   window.requestAnimationFrame(watch);
 };
 
@@ -80,8 +79,8 @@ window.requestAnimationFrame((time) => {
 const defaultConfig = { callOnResize: true };
 
 export function usePosition(
-  ref: PositionReg["ref"],
-  cb: PositionReg["cb"],
+  ref: HTMLElement | undefined,
+  cb: PositionCallback,
   config?: PositionConfig,
   deps?: unknown[]
 ) {
@@ -107,17 +106,6 @@ export function usePosition(
       reg.config = config || defaultConfig;
     }
   }, [ref, cb, config]);
-
-  /* useEffect(() => {
-    if (id) {
-      const reg = calls.find(({ id: itemID }) => itemID === id);
-      if (reg) {
-        reg.cb = cb;
-        reg.ref = ref;
-        reg.config = config || defaultConfig;
-      }
-    }
-  }, [id, ref, cb, config]); */
 
   useEffect(() => {
     if (objectRef.current) {
