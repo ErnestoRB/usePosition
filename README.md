@@ -1,6 +1,6 @@
 # usePosition
 
-This hook helps to know if a element has changed its position on the screen. Relies on requestAnimationFrame and clientBoundRect, so it should work on most browsers.
+This hook helps to know if a element has changed its position on the screen. Relies on requestAnimationFrame and boundingClientRect, so it should work on most modern browsers.
 
 ## Installation
 
@@ -23,8 +23,8 @@ You need to:
 
 1. Import usePosition hook
 
-```javacript
-    import { usePosition } from '@ernestorb/useposition'
+```javascript
+import { usePosition } from "@ernestorb/useposition";
 ```
 
 1. Store the HTMLElement reference on state
