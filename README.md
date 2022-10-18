@@ -4,7 +4,7 @@ This hook helps to know if a element has changed its position on the screen. Rel
 
 ## Demo
 
-The demo can be viewed [here on stackblitz](https://react-ts-ouyepc.stackblitz.io)
+The demo can be viewed [here on stackblitz](https://stackblitz.com/edit/react-ts-ouyepc?devToolsHeight=33&file=App.tsx)
 
 ## Installation
 
