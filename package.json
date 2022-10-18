@@ -1,6 +1,6 @@
 {
   "name": "@ernestorb/useposition",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "type": "module",
   "repository": "github:ErnestoRB/usePosition",
   "keywords": [
@@ -25,6 +25,7 @@
     "dev": "vite",
     "prebuild": "tsc --noEmit && vite build",
     "build": "tsc --declaration --emitDeclarationOnly --declarationDir './types' && api-extractor run --local --verbose && rm -rf './types'",
+    "prepare": "npm run build",
     "preview": "vite preview"
   },
   "devDependencies": {
