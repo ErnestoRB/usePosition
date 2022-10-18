@@ -2,6 +2,10 @@
 
 This hook helps to know if a element has changed its position on the screen. Relies on requestAnimationFrame and boundingClientRect, so it should work on most modern browsers.
 
+## Demo
+
+The demo can be viewed [here on stackblitz](https://react-ts-ouyepc.stackblitz.io)
+
 ## Installation
 
 ```
