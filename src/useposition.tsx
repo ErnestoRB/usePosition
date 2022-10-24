@@ -8,6 +8,7 @@ interface PositionExtraValues {
   windowResize: boolean;
   screenWidth: number;
   screenHeight: number;
+  visible: number
 }
 
 type PositionCallback = (rect: DOMRect, extra: PositionExtraValues) => any;
@@ -39,9 +40,9 @@ const watch = (time: DOMHighResTimeStamp) => {
     return;
   }
   lastExecute = time;
-  const actualWidth = window.innerWidth;
-  const actualHeight = window.innerHeight;
-  const windowResize = oldWidth !== actualWidth || oldHeight !== actualHeight;
+  const actualWindowWidth = window.innerWidth;
+  const actualWindowHeight = window.innerHeight;
+  const windowResize = oldWidth !== actualWindowWidth || oldHeight !== actualWindowHeight;
 
   clients.forEach((r) => {
     if (!r.ref || !r.cb) return;
@@ -53,7 +54,13 @@ const watch = (time: DOMHighResTimeStamp) => {
 
     const { top, left } = rect;
     const hasMoved = r.prevVal.top !== top || r.prevVal.left !== left;
-    const extraValuesObject = { windowResize, screenWidth: actualWidth, screenHeight: actualHeight };
+    const elementArea = rect.width * rect.height;
+    function between(number: number, min: number, max: number) {
+      return Math.min(max, Math.max(min,number))
+    }
+    const visibleArea = (between(rect.right, 0,actualWindowWidth) - between(rect.left, 0,actualWindowWidth)) * (between(rect.bottom, 0,actualWindowHeight) - between(rect.top, 0,actualWindowHeight))
+    const visibleThreshold = visibleArea / elementArea;
+    const extraValuesObject = { windowResize, screenWidth: actualWindowWidth, screenHeight: actualWindowHeight, visible: visibleThreshold};
     if (!hasMoved) {
       if (r.config.callOnResize && windowResize) {
         r.cb(rect, extraValuesObject);
@@ -69,8 +76,8 @@ const watch = (time: DOMHighResTimeStamp) => {
     r.cb(rect, extraValuesObject);
   });
   if (windowResize) {
-    oldWidth = actualWidth;
-    oldHeight = actualHeight;
+    oldWidth = actualWindowWidth;
+    oldHeight = actualWindowHeight;
   }
   window.requestAnimationFrame(watch);
 };
