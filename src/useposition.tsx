@@ -6,7 +6,10 @@ interface PositionConfig {
 
 interface PositionExtraValues {
   windowResize: boolean;
+  screenWidth: number;
+  screenHeight: number;
 }
+
 type PositionCallback = (rect: DOMRect, extra: PositionExtraValues) => any;
 
 interface PositionReg {
@@ -24,7 +27,7 @@ function generateID() {
   return `id-${n1.toString(16)}-${n2.toString(10)}`;
 }
 
-const calls: Array<PositionReg> = [];
+const clients: Array<PositionReg> = [];
 
 let oldWidth = window.innerWidth;
 let oldHeight = window.innerHeight;
@@ -40,7 +43,7 @@ const watch = (time: DOMHighResTimeStamp) => {
   const actualHeight = window.innerHeight;
   const windowResize = oldWidth !== actualWidth || oldHeight !== actualHeight;
 
-  calls.forEach((r) => {
+  clients.forEach((r) => {
     if (!r.ref || !r.cb) return;
     const rect = r.ref.getBoundingClientRect();
     if (!r.prevVal) {
@@ -50,19 +53,20 @@ const watch = (time: DOMHighResTimeStamp) => {
 
     const { top, left } = rect;
     const hasMoved = r.prevVal.top !== top || r.prevVal.left !== left;
+    const extraValuesObject = { windowResize, screenWidth: actualWidth, screenHeight: actualHeight };
     if (!hasMoved) {
       if (r.config.callOnResize && windowResize) {
-        r.cb(rect, { windowResize });
+        r.cb(rect, extraValuesObject);
         return;
       }
       if (r.depsChange) {
         r.depsChange = false;
-        r.cb(rect, { windowResize });
+        r.cb(rect, extraValuesObject);
       }
       return;
     }
     r.prevVal = rect;
-    r.cb(rect, { windowResize });
+    r.cb(rect, extraValuesObject);
   });
   if (windowResize) {
     oldWidth = actualWidth;
@@ -79,37 +83,37 @@ window.requestAnimationFrame((time) => {
 const defaultConfig = { callOnResize: true };
 
 export function usePosition(
-  ref: HTMLElement | undefined,
+  ref: React.RefObject<HTMLElement>,
   cb: PositionCallback,
   config?: PositionConfig,
   deps?: unknown[]
 ) {
-  const objectRef = useRef<PositionReg | undefined>();
+  const clientRef = useRef<PositionReg | undefined>();
 
   useEffect(() => {
     const idGen = generateID();
-    const object = { id: idGen, config: defaultConfig };
-    objectRef.current = object;
-    calls.push(object);
+    const object = { id: idGen, ref: ref.current || undefined, config: defaultConfig };
+    clientRef.current = object;
+    clients.push(object);
     return () => {
-      const index = calls.findIndex(({ id: itemID }) => idGen === itemID);
-      calls.splice(index, index === -1 ? 0 : 1);
-      objectRef.current = undefined;
+      const index = clients.indexOf(object)
+      clients.splice(index, index === -1 ? 0 : 1);
+      clientRef.current = undefined;
     };
   }, []);
 
   useEffect(() => {
-    if (objectRef.current) {
-      const reg = objectRef.current;
+    if (clientRef.current) {
+      const reg = clientRef.current;
       reg.cb = cb;
-      reg.ref = ref;
+      reg.ref = ref.current || undefined;
       reg.config = config || defaultConfig;
     }
   }, [ref, cb, config]);
 
   useEffect(() => {
-    if (objectRef.current) {
-      const reg = objectRef.current;
+    if (clientRef.current) {
+      const reg = clientRef.current;
       reg.depsChange = true;
     }
   }, deps || []);
