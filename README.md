@@ -2,6 +2,8 @@
 
 This hook helps to know if a element has changed its position on the screen. Relies on requestAnimationFrame and boundingClientRect, so it should work on most modern browsers.
 
+The data returned is a DOMRect object and some extra values I consider important. Check the [reference](#reference)
+
 ## Demo
 
 The demo can be viewed [here on stackblitz](https://stackblitz.com/edit/react-ts-ouyepc?devToolsHeight=33&file=App.tsx)
@@ -31,25 +33,53 @@ You need to:
 import { usePosition } from "@ernestorb/useposition";
 ```
 
-1. Store the HTMLElement reference on state
-2. Call the hook with the HTMLElement to be watched
-3. Define a function to be called whenever the position of the element changes
-4. Customize if you want to be called also if the window resize
+2. Get a Ref to the element to be watched
+3. Call the hook with the Ref as first arg and a callback as second, optionally pass a config object as third and also optionally a deps list as fourth
 
-**Example**
+## **Example**
 
 ```javascript
-useEffect(() => {
-    setElement(elementRef.current!);
-    // you need to give the HTMLElement, not the Ref itself, its mean to be this way for the rendering
-}, []);
-
 usePosition(
-    element, ({ left, right, bottom, top, width, height }, { windowResize }) => {
-        if(windowResize) {
-            // Window has been resized
-            return;
-        }
-        // position of element has changed
-    }, { callOnResize: true }, [deps])
+  elementRef,
+  (
+    { left, right, bottom, top, width, height } /* DOMRect */,
+    { windowResize } /* extra values object */
+  ) => {
+    if (windowResize) {
+      // Window has been resized
+      return;
+    }
+    // position of element has changed
+    // do something
+  },
+  { callOnResize: true },
+  [deps]
+);
+```
+
+## Reference
+
+**Callback**
+
+```typescript
+type PositionCallback = (rect: DOMRect, extra: PositionExtraValues) => any;
+```
+
+**Extra values**
+
+```typescript
+interface PositionExtraValues {
+  windowResize: boolean; // has window resized?
+  screenWidth: number; // actual screen width
+  screenHeight: number; // same but height
+  visible: number; // 0 (hidden) to 1 (totally visible) percent of visibility
+}
+```
+
+**Config object**
+
+```typescript
+interface PositionConfig {
+  callOnResize: boolean;
+}
 ```

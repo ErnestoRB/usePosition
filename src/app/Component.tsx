@@ -12,11 +12,11 @@ export default function Component() {
 
   usePosition(
     ref,
-    ({ left, }, { windowResize }) => {
+    ({ left, }, { windowResize, visible }) => {
       if(windowResize){
         alert("Oops. You resized the window,")
       }
-      console.log(`Position from left screen edge: ${left}`, `State value: ${open}`); // here we declare what we want to do
+      console.log(`Position from left screen edge: ${left}`, `State value: ${open}`, 'Percent visible: ' + visible); // here we declare what we want to do
     },
     undefined,
     [open]
