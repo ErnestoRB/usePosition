@@ -6,7 +6,7 @@ The data returned is a DOMRect object and some extra values I consider important
 
 ## Demo
 
-The demo can be viewed [here on stackblitz](https://stackblitz.com/edit/react-ts-ouyepc?devToolsHeight=33&file=App.tsx)
+The demo can be viewed [here on stackblitz](https://stackblitz.com/edit/react-ts-hd7pqd?devToolsHeight=33&file=App.tsx)
 
 ## Installation
 
