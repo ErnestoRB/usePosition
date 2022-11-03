@@ -81,15 +81,50 @@ describe("usePosition() + Component.tsx", () => {
     expect(button).toBeDefined();
   });
 
+  it("Component's callback its called on startup", async () => {
+    expect(window.requestAnimationFrame).toBeCalledTimes(0);
+    expect(clientBoundingMock).toBeDefined();
+    clientBoundingMock
+      .mockReturnValueOnce(new DOMRect(10, 10, 100, 100)) // first value, not callback called because of this value. this is cached
+      .mockReturnValueOnce(new DOMRect(10, 10, 100, 100)); // second value, callback called but due to initial state change
+    jest.advanceTimersByTime(2000); // initial call 1000, second at 2000
+    expect(window.requestAnimationFrame).toBeCalledTimes(2);
+    expect(window.console.log).toBeCalledTimes(1);
+    expect(window.console.log).toBeCalledWith(
+      "Position from left screen edge: 10",
+      "State value: true",
+      "Percent visible: 1"
+    );
+  });
+
   it("Component's callback its called on move", async () => {
     expect(window.requestAnimationFrame).toBeCalledTimes(0);
     expect(clientBoundingMock).toBeDefined();
     clientBoundingMock
-      .mockReturnValueOnce(new DOMRect(10, 10, 100, 100)) // first value, not callback called with this value
-      .mockReturnValueOnce(new DOMRect(50, 50, 100, 100)); // second value, callback called
-    jest.advanceTimersByTime(2000); // initial call 1000, second at 2000
-    expect(window.requestAnimationFrame).toBeCalledTimes(2);
-    expect(window.console.log).toBeCalledWith(
+      .mockReturnValueOnce(new DOMRect(10, 10, 100, 100)) // first value, not callback called because of this value. this is cached
+      .mockReturnValueOnce(new DOMRect(50, 50, 100, 100)) // second value, callback called but due to initial state change
+      .mockReturnValueOnce(new DOMRect(100, 50, 100, 100)); // third value, this is called because its value its diffrente from the second
+    jest.advanceTimersByTime(3000); // initial call 1000, second at 2000, third at 3000
+    expect(window.requestAnimationFrame).toBeCalledTimes(3);
+    expect(window.console.log).toBeCalledTimes(2);
+    expect(window.console.log).toHaveBeenLastCalledWith(
+      "Position from left screen edge: 100",
+      "State value: true",
+      "Percent visible: 1"
+    );
+  });
+
+  it("Component's callback its NOT called on NOT move", async () => {
+    expect(window.requestAnimationFrame).toBeCalledTimes(0);
+    expect(clientBoundingMock).toBeDefined();
+    clientBoundingMock
+      .mockReturnValueOnce(new DOMRect(50, 50, 100, 100)) // first value, not callback called because of this value. this is cached
+      .mockReturnValueOnce(new DOMRect(50, 50, 100, 100)) // second value, callback called but due to initial state change
+      .mockReturnValueOnce(new DOMRect(50, 50, 100, 100)); // third value, as this is the same as the second it should not log anything
+    jest.advanceTimersByTime(3000); // initial call 1000, second at 2000, third at 3000
+    expect(window.requestAnimationFrame).toBeCalledTimes(3);
+    expect(window.console.log).toBeCalledTimes(1); // only for the state change
+    expect(window.console.log).toHaveBeenLastCalledWith(
       "Position from left screen edge: 50",
       "State value: true",
       "Percent visible: 1"

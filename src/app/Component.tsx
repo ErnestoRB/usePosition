@@ -1,7 +1,7 @@
-import React from 'react';
-import { useRef, useState } from 'react';
-import { usePosition } from '../useposition';
-import './style.css';
+import React from "react";
+import { useRef, useState } from "react";
+import { usePosition } from "../useposition";
+import "./style.css";
 
 export default function Component() {
   const ref = useRef<HTMLDivElement>(null);
@@ -12,18 +12,22 @@ export default function Component() {
 
   usePosition(
     ref,
-    ({ left, }, { windowResize, visible }) => {
-      if(windowResize){
-        alert("Oops. You resized the window,")
+    ({ left }, { windowResize, visible }) => {
+      if (windowResize) {
+        alert("Oops. You resized the window,");
       }
-      console.log(`Position from left screen edge: ${left}`, `State value: ${open}`, 'Percent visible: ' + visible); // here we declare what we want to do
+      console.log(
+        `Position from left screen edge: ${left}`,
+        `State value: ${open}`,
+        "Percent visible: " + visible
+      ); // here we declare what we want to do
     },
     undefined,
     [open]
   );
 
   return (
-    <div id='container'  >
+    <div id="container">
       <label htmlFor="offset">Pixel offset (how much the block moves)</label>
       <input
         name="offset"
@@ -33,6 +37,7 @@ export default function Component() {
       ></input>
       <button
         type="button"
+        data-testid="button"
         onClick={() => {
           setX((x) => x + offset);
         }}
@@ -47,11 +52,14 @@ export default function Component() {
       >
         Change state deps
       </button>
-      <div className='block-container'>
-      <div className='block' style={{ left: x }} ref={ref}/>
-        
+      <div className="block-container">
+        <div
+          className="block"
+          data-testid="block"
+          style={{ left: x }}
+          ref={ref}
+        />
       </div>
-      
     </div>
   );
 }
