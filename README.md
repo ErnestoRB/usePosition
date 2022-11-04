@@ -60,3 +60,10 @@ usePosition(
 ## Reference
 
 Check it [here](docs/index.md)
+
+## Testing
+
+1. Install all devDependencies
+2. Run package.json "test" script
+
+You can check the coverage here []
