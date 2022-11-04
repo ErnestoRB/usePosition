@@ -66,4 +66,4 @@ Check it [here](docs/index.md)
 1. Install all devDependencies
 2. Run package.json "test" script
 
-You can check the coverage here []
+You can check the coverage here [coverage](https://ernestorb.com/usePosition)
