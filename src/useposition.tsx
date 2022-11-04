@@ -1,14 +1,36 @@
+/**
+ * usePosition Hook
+ * @packageDocumentation
+ */
 import { useEffect, useRef } from "react";
-
-interface PositionConfig {
+/**
+ * @public
+ */
+export interface PositionConfig {
   callOnResize: boolean;
 }
 
-interface PositionExtraValues {
+/**
+ * @public
+ */
+export interface PositionExtraValues {
   windowResize: boolean;
+  screenWidth: number;
+  screenHeight: number;
+  visible: number;
 }
-type PositionCallback = (rect: DOMRect, extra: PositionExtraValues) => any;
 
+/**
+ * @public
+ */
+export type PositionCallback = (
+  rect: DOMRect,
+  extra: PositionExtraValues
+) => any;
+
+/**
+ * @internal
+ */
 interface PositionReg {
   id?: string;
   ref?: HTMLElement;
@@ -24,7 +46,7 @@ function generateID() {
   return `id-${n1.toString(16)}-${n2.toString(10)}`;
 }
 
-const calls: Array<PositionReg> = [];
+const clients: Array<PositionReg> = [];
 
 let oldWidth = window.innerWidth;
 let oldHeight = window.innerHeight;
@@ -36,11 +58,12 @@ const watch = (time: DOMHighResTimeStamp) => {
     return;
   }
   lastExecute = time;
-  const actualWidth = window.innerWidth;
-  const actualHeight = window.innerHeight;
-  const windowResize = oldWidth !== actualWidth || oldHeight !== actualHeight;
+  const actualWindowWidth = window.innerWidth;
+  const actualWindowHeight = window.innerHeight;
+  const windowResize =
+    oldWidth !== actualWindowWidth || oldHeight !== actualWindowHeight;
 
-  calls.forEach((r) => {
+  clients.forEach((r) => {
     if (!r.ref || !r.cb) return;
     const rect = r.ref.getBoundingClientRect();
     if (!r.prevVal) {
@@ -50,23 +73,39 @@ const watch = (time: DOMHighResTimeStamp) => {
 
     const { top, left } = rect;
     const hasMoved = r.prevVal.top !== top || r.prevVal.left !== left;
+    const elementArea = rect.width * rect.height;
+    function between(number: number, min: number, max: number) {
+      return Math.min(max, Math.max(min, number));
+    }
+    const visibleArea =
+      (between(rect.right, 0, actualWindowWidth) -
+        between(rect.left, 0, actualWindowWidth)) *
+      (between(rect.bottom, 0, actualWindowHeight) -
+        between(rect.top, 0, actualWindowHeight));
+    const visibleThreshold = visibleArea / elementArea;
+    const extraValuesObject = {
+      windowResize,
+      screenWidth: actualWindowWidth,
+      screenHeight: actualWindowHeight,
+      visible: visibleThreshold,
+    };
     if (!hasMoved) {
       if (r.config.callOnResize && windowResize) {
-        r.cb(rect, { windowResize });
+        r.cb(rect, extraValuesObject);
         return;
       }
       if (r.depsChange) {
         r.depsChange = false;
-        r.cb(rect, { windowResize });
+        r.cb(rect, extraValuesObject);
       }
       return;
     }
     r.prevVal = rect;
-    r.cb(rect, { windowResize });
+    r.cb(rect, extraValuesObject);
   });
   if (windowResize) {
-    oldWidth = actualWidth;
-    oldHeight = actualHeight;
+    oldWidth = actualWindowWidth;
+    oldHeight = actualWindowHeight;
   }
   window.requestAnimationFrame(watch);
 };
@@ -78,38 +117,50 @@ window.requestAnimationFrame((time) => {
 
 const defaultConfig = { callOnResize: true };
 
+/**
+ * @public
+ * Hook used to retrieve the element DOMRect and some computed value
+ * @param ref - The React Ref of the element to be watched
+ * @param cb - Callback
+ * @param config - Behavior config.
+ * @param deps - Some dependencies, if changes the hook retriggers
+ */
 export function usePosition(
-  ref: HTMLElement | undefined,
+  ref: React.RefObject<HTMLElement>,
   cb: PositionCallback,
   config?: PositionConfig,
   deps?: unknown[]
 ) {
-  const objectRef = useRef<PositionReg | undefined>();
+  const clientRef = useRef<PositionReg | undefined>();
 
   useEffect(() => {
     const idGen = generateID();
-    const object = { id: idGen, config: defaultConfig };
-    objectRef.current = object;
-    calls.push(object);
+    const object = {
+      id: idGen,
+      ref: ref.current || undefined,
+      config: defaultConfig,
+    };
+    clientRef.current = object;
+    clients.push(object);
     return () => {
-      const index = calls.findIndex(({ id: itemID }) => idGen === itemID);
-      calls.splice(index, index === -1 ? 0 : 1);
-      objectRef.current = undefined;
+      const index = clients.indexOf(object);
+      clients.splice(index, index === -1 ? 0 : 1);
+      clientRef.current = undefined;
     };
   }, []);
 
   useEffect(() => {
-    if (objectRef.current) {
-      const reg = objectRef.current;
+    if (clientRef.current) {
+      const reg = clientRef.current;
       reg.cb = cb;
-      reg.ref = ref;
+      reg.ref = ref.current || undefined;
       reg.config = config || defaultConfig;
     }
   }, [ref, cb, config]);
 
   useEffect(() => {
-    if (objectRef.current) {
-      const reg = objectRef.current;
+    if (clientRef.current) {
+      const reg = clientRef.current;
       reg.depsChange = true;
     }
   }, deps || []);

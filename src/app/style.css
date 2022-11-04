@@ -1,0 +1,24 @@
+button {
+    background-color: black;
+    outline: none;
+    color: white;
+    border: 1px solid black;
+    padding: 5px 10px;
+}
+
+div#container {
+    display: flex;
+    flex-direction: column;
+    row-gap: 5px;
+}
+
+div.block {
+    position: absolute;
+    background-color: crimson;
+    width: 100px;
+    height: 100px;
+}
+
+div.block-container {
+    position: relative;
+}

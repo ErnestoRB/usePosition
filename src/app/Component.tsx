@@ -1,33 +1,48 @@
-import React, { useEffect, useRef, useState } from "react";
+import React from "react";
+import { useRef, useState } from "react";
 import { usePosition } from "../useposition";
+import "./style.css";
 
 export default function Component() {
   const ref = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(true);
+  const [offset, setOffset] = useState(0);
+
   const [x, setX] = useState(0);
-  const [element, setElement] = useState<HTMLDivElement | undefined>();
+
   usePosition(
-    element,
-    ({ left }) => {
-      console.log(left, open);
+    ref,
+    ({ left }, { windowResize, visible }) => {
+      if (windowResize) {
+        alert("Oops. You resized the window,");
+      }
+      console.log(
+        `Position from left screen edge: ${left}`,
+        `State value: ${open}`,
+        "Percent visible: " + visible
+      ); // here we declare what we want to do
     },
     undefined,
     [open]
   );
 
-  useEffect(() => {
-    setElement(ref.current!);
-  }, []);
-
   return (
-    <div ref={ref} style={{ position: "fixed", left: x }}>
+    <div id="container">
+      <label htmlFor="offset">Pixel offset (how much the block moves)</label>
+      <input
+        name="offset"
+        type="number"
+        value={offset}
+        onChange={(e) => setOffset(Number(e.target.value))}
+      ></input>
       <button
         type="button"
+        data-testid="button"
         onClick={() => {
-          setX((x) => x + 1);
+          setX((x) => x + offset);
         }}
       >
-        Mover
+        Move
       </button>
       <button
         type="button"
@@ -35,8 +50,16 @@ export default function Component() {
           setOpen((x) => !x);
         }}
       >
-        Cambiar estado
+        Change state deps
       </button>
+      <div className="block-container">
+        <div
+          className="block"
+          data-testid="block"
+          style={{ left: x }}
+          ref={ref}
+        />
+      </div>
     </div>
   );
 }
