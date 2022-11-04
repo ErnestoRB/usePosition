@@ -59,27 +59,4 @@ usePosition(
 
 ## Reference
 
-**Callback**
-
-```typescript
-type PositionCallback = (rect: DOMRect, extra: PositionExtraValues) => any;
-```
-
-**Extra values**
-
-```typescript
-interface PositionExtraValues {
-  windowResize: boolean; // has window resized?
-  screenWidth: number; // actual screen width
-  screenHeight: number; // same but height
-  visible: number; // 0 (hidden) to 1 (totally visible) percent of visibility
-}
-```
-
-**Config object**
-
-```typescript
-interface PositionConfig {
-  callOnResize: boolean;
-}
-```
+Check it [here](docs/index.md)

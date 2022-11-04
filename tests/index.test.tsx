@@ -130,4 +130,24 @@ describe("usePosition() + Component.tsx", () => {
       "Percent visible: 1"
     );
   });
+
+  it("Component's callback its called if screen resizes", async () => {
+    expect(window.requestAnimationFrame).toBeCalledTimes(0);
+    expect(clientBoundingMock).toBeDefined();
+    clientBoundingMock
+      .mockReturnValueOnce(new DOMRect(50, 50, 100, 100)) // first value, not callback called because of this value. this is cached
+      .mockReturnValueOnce(new DOMRect(50, 50, 100, 100)) // second value, callback called but due to initial state change
+      .mockReturnValueOnce(new DOMRect(50, 50, 100, 100)); // third value, as this is the same as the second it should not log anything
+    jest.advanceTimersByTime(2000); // initial call 1000, second at 2000, third at 3000
+    window.innerHeight = 1001;
+    jest.advanceTimersByTime(1000);
+    expect(window.requestAnimationFrame).toBeCalledTimes(3);
+    expect(window.console.log).toBeCalledTimes(2);
+    expect(window.console.log).toHaveBeenLastCalledWith(
+      "Position from left screen edge: 50",
+      "State value: true",
+      "Percent visible: 1"
+    );
+    expect(window.alert).toBeCalled();
+  });
 });

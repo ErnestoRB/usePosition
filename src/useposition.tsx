@@ -1,18 +1,36 @@
+/**
+ * usePosition Hook
+ * @packageDocumentation
+ */
 import { useEffect, useRef } from "react";
-
-interface PositionConfig {
+/**
+ * @public
+ */
+export interface PositionConfig {
   callOnResize: boolean;
 }
 
-interface PositionExtraValues {
+/**
+ * @public
+ */
+export interface PositionExtraValues {
   windowResize: boolean;
   screenWidth: number;
   screenHeight: number;
-  visible: number
+  visible: number;
 }
 
-type PositionCallback = (rect: DOMRect, extra: PositionExtraValues) => any;
+/**
+ * @public
+ */
+export type PositionCallback = (
+  rect: DOMRect,
+  extra: PositionExtraValues
+) => any;
 
+/**
+ * @internal
+ */
 interface PositionReg {
   id?: string;
   ref?: HTMLElement;
@@ -42,7 +60,8 @@ const watch = (time: DOMHighResTimeStamp) => {
   lastExecute = time;
   const actualWindowWidth = window.innerWidth;
   const actualWindowHeight = window.innerHeight;
-  const windowResize = oldWidth !== actualWindowWidth || oldHeight !== actualWindowHeight;
+  const windowResize =
+    oldWidth !== actualWindowWidth || oldHeight !== actualWindowHeight;
 
   clients.forEach((r) => {
     if (!r.ref || !r.cb) return;
@@ -56,11 +75,20 @@ const watch = (time: DOMHighResTimeStamp) => {
     const hasMoved = r.prevVal.top !== top || r.prevVal.left !== left;
     const elementArea = rect.width * rect.height;
     function between(number: number, min: number, max: number) {
-      return Math.min(max, Math.max(min,number))
+      return Math.min(max, Math.max(min, number));
     }
-    const visibleArea = (between(rect.right, 0,actualWindowWidth) - between(rect.left, 0,actualWindowWidth)) * (between(rect.bottom, 0,actualWindowHeight) - between(rect.top, 0,actualWindowHeight))
+    const visibleArea =
+      (between(rect.right, 0, actualWindowWidth) -
+        between(rect.left, 0, actualWindowWidth)) *
+      (between(rect.bottom, 0, actualWindowHeight) -
+        between(rect.top, 0, actualWindowHeight));
     const visibleThreshold = visibleArea / elementArea;
-    const extraValuesObject = { windowResize, screenWidth: actualWindowWidth, screenHeight: actualWindowHeight, visible: visibleThreshold};
+    const extraValuesObject = {
+      windowResize,
+      screenWidth: actualWindowWidth,
+      screenHeight: actualWindowHeight,
+      visible: visibleThreshold,
+    };
     if (!hasMoved) {
       if (r.config.callOnResize && windowResize) {
         r.cb(rect, extraValuesObject);
@@ -89,6 +117,14 @@ window.requestAnimationFrame((time) => {
 
 const defaultConfig = { callOnResize: true };
 
+/**
+ * @public
+ * Hook used to retrieve the element DOMRect and some computed value
+ * @param ref - The React Ref of the element to be watched
+ * @param cb - Callback
+ * @param config - Behavior config.
+ * @param deps - Some dependencies, if changes the hook retriggers
+ */
 export function usePosition(
   ref: React.RefObject<HTMLElement>,
   cb: PositionCallback,
@@ -99,11 +135,15 @@ export function usePosition(
 
   useEffect(() => {
     const idGen = generateID();
-    const object = { id: idGen, ref: ref.current || undefined, config: defaultConfig };
+    const object = {
+      id: idGen,
+      ref: ref.current || undefined,
+      config: defaultConfig,
+    };
     clientRef.current = object;
     clients.push(object);
     return () => {
-      const index = clients.indexOf(object)
+      const index = clients.indexOf(object);
       clients.splice(index, index === -1 ? 0 : 1);
       clientRef.current = undefined;
     };
