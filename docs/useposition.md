@@ -8,7 +8,8 @@
 
 |  Function | Description |
 |  --- | --- |
-|  [usePosition(ref, cb, config, deps)](./useposition.useposition.md) | Hook used to retrieve the element DOMRect and some computed value |
+|  [\_\_usePosition(ref, callback, config, deps)](./useposition.__useposition.md) | Classic hook used to call the specified callback with the element position |
+|  [usePosition(ref, config)](./useposition.useposition.md) | Hook used to retrieve the element position |
 
 ## Interfaces
 

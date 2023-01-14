@@ -4,12 +4,12 @@
 
 ## usePosition() function
 
-Hook used to retrieve the element DOMRect and some computed value
+Hook used to retrieve the element position
 
 <b>Signature:</b>
 
 ```typescript
-export declare function usePosition(ref: React.RefObject<HTMLElement>, cb: PositionCallback, config?: PositionConfig, deps?: unknown[]): void;
+export declare function usePosition(ref: React.RefObject<HTMLElement>, config?: PositionConfig): (DOMRect & PositionExtraValues) | undefined;
 ```
 
 ## Parameters
@@ -17,11 +17,9 @@ export declare function usePosition(ref: React.RefObject<HTMLElement>, cb: Posit
 |  Parameter | Type | Description |
 |  --- | --- | --- |
 |  ref | React.RefObject&lt;HTMLElement&gt; | The React Ref of the element to be watched |
-|  cb | PositionCallback | Callback |
 |  config | [PositionConfig](./useposition.positionconfig.md) | <i>(Optional)</i> Behavior config. |
-|  deps | unknown\[\] | <i>(Optional)</i> Some dependencies, if changes the hook retriggers |
 
 <b>Returns:</b>
 
-void
+(DOMRect &amp; [PositionExtraValues](./useposition.positionextravalues.md)<!-- -->) \| undefined
 
