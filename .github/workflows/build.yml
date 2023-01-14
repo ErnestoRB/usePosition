@@ -1,0 +1,22 @@
+name: Build and test
+
+on:
+  push:
+    branches-ignore:
+      - master
+
+jobs:
+  # Single deploy job since we're building and testing
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm ci
+      - run: npm build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build-${{ env.GITHUB_SHA }}
+          path: dist/
