@@ -8,7 +8,7 @@
 
 |  Function | Description |
 |  --- | --- |
-|  [\_\_usePosition(ref, callback, config, deps)](./useposition.__useposition.md) | Classic hook used to call the specified callback with the element position |
+|  [\_\_usePosition(ref, callback, config, deps)](./useposition.__useposition.md) | Hook used to call the specified callback with the element position |
 |  [usePosition(ref, config)](./useposition.useposition.md) | Hook used to retrieve the element position |
 
 ## Interfaces

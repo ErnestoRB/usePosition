@@ -1,6 +1,6 @@
 jest.useFakeTimers();
 import manager from "../src/engine";
-import { PositionReg } from "../src/vite-env";
+import { PositionReg } from "../src/definitions";
 import { DOMRect } from "./utils";
 
 describe("Engine ", () => {
