@@ -19,5 +19,5 @@ jobs:
       - run: npm test
       - uses: actions/upload-artifact@v3
         with:
-          name: build-${{ env.GITHUB_SHA }}
+          name: build-${{ github.sha }}
           path: dist/
