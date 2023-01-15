@@ -1,5 +1,4 @@
-# Simple workflow for deploying static content to GitHub Pages
-name: Deploy coverage report to GH Pages
+name: Deploy coverage to GH
 
 on:
   # Runs on pushes targeting the default branch
@@ -30,13 +29,19 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm install
+      - run: npm test
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v1
         with:
           # Upload just the coverage static
-          path: './coverage/lcov-report'
+          path: "./coverage/lcov-report"
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v1
