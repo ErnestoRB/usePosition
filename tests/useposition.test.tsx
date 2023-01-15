@@ -40,8 +40,6 @@ describe("usePosition hook", () => {
     act(() => {
       jest.advanceTimersByTime(1000);
     });
-    console.log(result.current);
-
     expect(clientBoundingMock).toHaveBeenCalledTimes(1);
     expect(result.current?.top).toBe(0);
     expect(result.current?.left).toBe(0);
