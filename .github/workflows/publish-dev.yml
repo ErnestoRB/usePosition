@@ -26,9 +26,9 @@ jobs:
         with:
           registry-url: "https://registry.npmjs.org"
           node-version: 18
-      - run: npm install
       - name: Bump prerelease version
         run: npm version prerelease
+      - run: npm install
       - run: npm run build --if-present
       - run: npm test
       - uses: stefanzweifel/git-auto-commit-action@v4
