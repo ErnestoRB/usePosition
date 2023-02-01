@@ -1,0 +1,40 @@
+name: Publish to NPM [Dev]
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches:
+      - "dev**"
+      - "fix**"
+      - "impl**"
+    paths:
+      - "**.ts"
+      - "**.tsx"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # Single deploy job since we're just deploying
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          registry-url: "https://registry.npmjs.org"
+          node-version: 18
+      - run: npm install
+      - name: Bump prerelease version
+        run: npm version prerelease
+      - run: npm run build --if-present
+      - run: npm test
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Bump prerelease version
+      - name: Publish
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
