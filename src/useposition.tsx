@@ -14,7 +14,7 @@ import {
  * @param config - Behavior config.
  */
 export function usePosition(
-  ref: React.RefObject<HTMLElement>,
+  ref: React.RefObject<HTMLElement> | undefined,
   config?: PositionConfig
 ) {
   const clientRef = useRef<PositionReg | undefined>();
@@ -22,19 +22,6 @@ export function usePosition(
   const [data, setData] = useState<(DOMRect & PositionExtraValues) | undefined>(
     undefined
   );
-
-  /*   useEffect(() => {
-    if (ref.current) {
-      const initialRect = getDOMRect(ref.current);
-      setData({
-        ...initialRect,
-        windowResize: false,
-        visible: determineVisibility(initialRect),
-        ...getWindowMeasure(),
-      });
-    }
-  }, []);
- */
   useEffect(() => {
     if (typeof window === "undefined") return;
     const idGen = generateID();
@@ -47,7 +34,7 @@ export function usePosition(
         };
         setData(data);
       },
-      ref: ref.current || undefined,
+      ref: ref?.current!,
       config: defaultConfig,
     };
     clientRef.current = object;

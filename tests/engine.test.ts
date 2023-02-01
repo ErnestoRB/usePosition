@@ -21,6 +21,7 @@ describe("Engine ", () => {
   afterEach(() => {
     callback.mockClear();
     requestAnimationFrame.mockClear();
+    clientBoundingMock.mockClear();
   });
 
   it("JSDOM available", () => {
@@ -35,8 +36,27 @@ describe("Engine ", () => {
     expect(callback).toBeCalledTimes(1);
     window.requestAnimationFrame(callback);
     jest.advanceTimersByTime(1000);
-
     expect(callback).toBeCalledTimes(2);
+  });
+
+  it("Callback its NOT called due ref is empty", () => {
+    expect(callback).toBeCalledTimes(0);
+    const object = {
+      id: "asd",
+      ref: undefined,
+      callback,
+      config: { callOnResize: true },
+    };
+    manager.register(object);
+    jest.advanceTimersByTime(1000);
+    expect(callback).toBeCalledTimes(0); // no initial call
+    expect(requestAnimationFrame).toBeCalledTimes(1);
+    clientBoundingMock.mockReturnValue(new DOMRect(20, 20, 120, 120));
+    jest.advanceTimersByTime(1000);
+    expect(requestAnimationFrame).toBeCalledTimes(2);
+    expect(callback).toBeCalledTimes(0); // no call after
+    expect(clientBoundingMock).toBeCalledTimes(0);
+    manager.unregister(object);
   });
 
   it("Callback its called properly on position change", () => {
@@ -51,9 +71,11 @@ describe("Engine ", () => {
     jest.advanceTimersByTime(1000);
     expect(callback).toBeCalledTimes(1); // initial call
     expect(requestAnimationFrame).toBeCalledTimes(1);
+    expect(clientBoundingMock).toBeCalledTimes(1);
     clientBoundingMock.mockReturnValue(new DOMRect(20, 20, 120, 120));
     jest.advanceTimersByTime(1000);
     expect(requestAnimationFrame).toBeCalledTimes(2);
+    expect(clientBoundingMock).toBeCalledTimes(2);
     expect(callback).toBeCalledTimes(2); // called because moved
     manager.unregister(object);
   });
@@ -70,9 +92,11 @@ describe("Engine ", () => {
     jest.advanceTimersByTime(1000);
     expect(callback).toBeCalledTimes(1); // initial call
     expect(requestAnimationFrame).toBeCalledTimes(1);
+    expect(clientBoundingMock).toBeCalledTimes(1);
     jest.advanceTimersByTime(1000);
     expect(requestAnimationFrame).toBeCalledTimes(2);
     expect(callback).toBeCalledTimes(1); // no called because position is the  same
+    expect(clientBoundingMock).toBeCalledTimes(2);
     manager.unregister(object);
   });
 
