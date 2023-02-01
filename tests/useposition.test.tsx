@@ -74,12 +74,14 @@ describe("usePosition hook", () => {
     act(() => {
       jest.advanceTimersByTime(1000);
     });
+    expect(clientBoundingMock).toHaveBeenCalledTimes(1);
     expect(result.current?.windowResize).toBe(false);
 
     act(() => {
       window.innerWidth = 9999;
       jest.advanceTimersByTime(1000);
     });
+    expect(clientBoundingMock).toHaveBeenCalledTimes(2);
     expect(result.current?.windowResize).toBe(true);
     expect(result.current?.screenWidth).toBe(9999);
   });
@@ -93,6 +95,17 @@ describe("usePosition hook", () => {
     act(() => {
       jest.advanceTimersByTime(1000);
     });
+    expect(clientBoundingMock).toHaveBeenCalledTimes(0);
+    expect(result.current).toBeUndefined();
+  });
+
+  it("Hook does nothing when value is empty", () => {
+    const { result } = renderHook(() => usePosition(undefined));
+    expect(result.current).toBeUndefined();
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    expect(clientBoundingMock).toHaveBeenCalledTimes(0);
     expect(result.current).toBeUndefined();
   });
 });
